@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TARK / РЕГИОН</title>
+    <title>TARK / СИСТЕМА</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <style>
@@ -28,11 +28,11 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
         }
 
+        /* --- HEADER & NAVIGATION --- */
         header {
             position: fixed;
             display: flex;
@@ -42,139 +42,99 @@
             z-index: 1000;
         }
         header.as-logo { top: 45%; transform: translateY(-50%); }
-        header.as-header { top: 40px; transform: scale(0.8); }
+        header.as-header { top: 20px; transform: scale(0.7); }
 
         .logo-main { font-size: 42px; font-weight: 900; letter-spacing: 15px; color: #fff; line-height: 1; margin-right: -15px; }
         .logo-sub { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #333; text-transform: uppercase; margin-top: 5px; text-align: right; width: 100%; }
 
-        .logo-slogan {
-            font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #ccc;
-            text-transform: uppercase; margin-top: 10px; text-align: center; width: 100%;
-            opacity: 0; transform: translateY(5px);
-            transition: all 1s ease 0.5s;
+        .nav-tabs {
+            position: fixed; top: 100px; display: flex; gap: 20px; opacity: 0;
+            transition: 1s ease 0.5s; z-index: 900;
         }
-        header.as-header .logo-slogan { opacity: 1; transform: translateY(0); }
-
-        #boot-status { 
-            position: absolute; top: 100px; width: 500px; left: 50%; transform: translateX(-50%);
-            text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 5px; 
-            font-weight: 800; transition: opacity 0.4s ease;
+        .nav-tabs.show { opacity: 1; }
+        
+        .tab-btn {
+            background: none; border: none; color: var(--sub-text); font-size: 10px;
+            font-weight: 900; letter-spacing: 3px; cursor: pointer; padding: 10px;
+            transition: 0.3s; text-transform: uppercase; border-bottom: 2px solid transparent;
         }
+        .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
+        /* --- CONTENT CONTAINERS --- */
         #app {
             display: none; flex-direction: column; align-items: center;
             opacity: 0; transition: opacity 1s ease;
-            margin-top: 80px;
+            margin-top: 160px; width: 100%;
         }
 
-        .stage {
-            position: relative;
-            width: 420px; 
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        .tab-content { display: none; width: 100%; max-width: 1200px; flex-direction: column; align-items: center; }
+        .tab-content.active { display: flex; }
 
+        /* --- MONITORING STYLES (FROM PREVIOUS) --- */
+        .stage { position: relative; width: 420px; display: flex; align-items: center; justify-content: center; margin-top: 40px;}
         .status-card {
-            background: var(--card-bg); 
-            border: 1px solid var(--muted); 
-            border-radius: 20px;
-            width: 100%; 
-            display: flex; flex-direction: column;
-            box-shadow: 0 50px 100px rgba(0,0,0,1); 
-            z-index: 20; 
-            overflow: hidden;
+            background: var(--card-bg); border: 1px solid var(--muted); border-radius: 20px;
+            width: 100%; display: flex; flex-direction: column;
+            box-shadow: 0 50px 100px rgba(0,0,0,1); z-index: 20; overflow: hidden;
             transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
-
         .status-card.compact { height: 210px; }
         .status-card.expanded { height: 320px; }
-
         .card-header { height: 60px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid rgba(255,255,255,0.02); }
         .label { color: var(--sub-text); font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
-        
         .card-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 30px; text-align: center; }
-        
         #server-result { font-size: 24px; font-weight: 900; text-transform: uppercase; color: #fff; width: 100%; line-height: 1.2; }
         #server-result.found { color: var(--success) !important; text-shadow: 0 0 40px rgba(0, 224, 255, 0.4); }
-
-        #bsg-hint { 
-            font-size: 11px; color: #fff; font-weight: 700; letter-spacing: 1px; 
-            margin-top: 0; height: 0; opacity: 0; overflow: hidden;
-            transition: all 0.6s ease; line-height: 1.5; 
-        }
+        #bsg-hint { font-size: 11px; color: #fff; font-weight: 700; letter-spacing: 1px; margin-top: 0; height: 0; opacity: 0; overflow: hidden; transition: all 0.6s ease; line-height: 1.5; }
         #bsg-hint.show { height: 40px; margin-top: 20px; opacity: 0.8; }
-
         #brute-logs { margin-top: 15px; font-size: 9px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
-
         .card-footer { height: 80px; border-top: 1px solid rgba(255,255,255,0.02); display: flex; align-items: center; justify-content: space-around; }
-
-        #ping-container { display: flex; align-items: center; width: 140px; }
         .ping-val { font-weight: 900; color: #fff; font-size: 20px; margin-left: 10px; display: inline-block; min-width: 20px; }
-
+        
         .side-panel {
-            position: absolute; 
-            top: 50%; 
-            left: 50%; 
-            width: 210px; 
-            height: 180px;
-            background: #08090b; 
-            border: 1px solid var(--muted); 
-            border-radius: 0 20px 20px 0;
-            display: flex; 
-            flex-direction: column; 
-            justify-content: center; 
-            padding: 0 20px 0 35px; 
-            opacity: 0; 
-            z-index: 10; 
-            transform: translate(0, -50%); 
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            position: absolute; top: 50%; left: 50%; width: 210px; height: 180px;
+            background: #08090b; border: 1px solid var(--muted); border-radius: 0 20px 20px 0;
+            display: flex; flex-direction: column; justify-content: center; padding: 0 20px 0 35px;
+            opacity: 0; z-index: 10; transform: translate(0, -50%); transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: none; 
         }
-        .side-panel.active { 
-            transform: translate(210px, -50%); 
-            opacity: 1; 
-            pointer-events: auto; 
-        }
+        .side-panel.active { transform: translate(210px, -50%); opacity: 1; pointer-events: auto; }
 
         .retry-btn { 
-            background: none; 
-            border: 1px solid #333; 
-            color: #666; 
-            font-size: 10px; 
-            font-weight: 800; 
-            letter-spacing: 2px; 
-            padding: 12px 24px; 
-            cursor: pointer; 
-            border-radius: 8px; 
-            transition: 0.3s;
-            position: relative;
-            z-index: 30;
+            background: none; border: 1px solid #333; color: #666; font-size: 10px; font-weight: 800; 
+            letter-spacing: 2px; padding: 12px 24px; cursor: pointer; border-radius: 8px; 
+            transition: 0.3s; position: relative; z-index: 30;
         }
         .retry-btn:hover:not(:disabled) { border-color: #fff; color: #fff; }
-        .retry-btn:disabled { opacity: 0.2; cursor: not-allowed; }
 
-        .social-area { position: fixed; bottom: 40px; display: flex; gap: 15px; opacity: 0; transition: 1s; }
-        .social-btn {
-            display: flex; align-items: center; justify-content: center;
-            width: 100px; height: 45px; border-radius: 8px; text-decoration: none;
-            font-size: 18px; color: rgba(255,255,255,0.6);
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        /* --- MAPS STYLES --- */
+        .maps-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px; width: 90%; padding: 20px;
         }
+        .map-card {
+            background: var(--card-bg); border: 1px solid var(--muted); border-radius: 12px;
+            padding: 20px; cursor: pointer; transition: 0.3s; text-align: center;
+        }
+        .map-card:hover { border-color: var(--accent); transform: translateY(-5px); }
+        .map-card i { font-size: 24px; color: var(--accent); margin-bottom: 10px; }
+        .map-card div { font-size: 12px; font-weight: 800; letter-spacing: 1px; }
 
-        .btn-tg:hover { background: var(--tg-color); color: #fff; box-shadow: 0 10px 20px rgba(34, 158, 217, 0.3); transform: translateY(-5px); }
-        .btn-tt:hover { background: var(--tt-color); color: #fff; box-shadow: -3px 0 0 #ff0050, 3px 0 0 #00f2ea, 0 10px 20px rgba(0,0,0,0.5); transform: translateY(-5px); }
-        .btn-da:hover { background: var(--da-color); color: #fff; box-shadow: 0 10px 20px rgba(255, 115, 0, 0.3); transform: translateY(-5px); }
+        .map-viewer {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 2000; display: none; flex-direction: column;
+        }
+        .map-viewer.active { display: flex; }
+        .map-viewer-header { height: 60px; background: #0d0e10; display: flex; align-items: center; padding: 0 20px; justify-content: space-between; border-bottom: 1px solid #222; }
+        .close-map { color: #fff; background: none; border: 1px solid #333; padding: 8px 15px; cursor: pointer; font-size: 10px; font-weight: 800; border-radius: 5px; }
 
+        /* --- UTILS --- */
+        #boot-status { position: absolute; top: 100px; width: 500px; left: 50%; transform: translateX(-50%); text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 5px; font-weight: 800; transition: opacity 0.4s ease; }
+        .social-area { position: fixed; bottom: 40px; display: flex; gap: 15px; opacity: 0; transition: 1s; }
+        .social-btn { display: flex; align-items: center; justify-content: center; width: 60px; height: 45px; border-radius: 8px; text-decoration: none; font-size: 18px; color: rgba(255,255,255,0.6); background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); transition: 0.4s; }
+        .social-btn:hover { background: var(--accent); color: #000; }
         .dots:after { content: ''; animation: dots 1.5s infinite; }
         @keyframes dots { 0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; } }
-
-        @keyframes serverFound {
-            0% { opacity: 0; transform: scale(0.9); }
-            100% { opacity: 1; transform: scale(1); }
-        }
-        .animate-found { animation: serverFound 0.5s ease forwards; }
     </style>
 </head>
 <body>
@@ -182,58 +142,79 @@
 <header id="site-header" class="as-logo">
     <div class="logo-main">/TARK</div>
     <div class="logo-sub">by feeboi</div>
-    <div class="logo-slogan">твоя помощь в фарме и квестах</div>
-    <div id="boot-status" class="boot-yellow">ЗАГРУЗКА СИСТЕМНЫХ МОДУЛЕЙ</div>
+    <div id="boot-status" class="boot-yellow">ИНИЦИАЛИЗАЦИЯ</div>
 </header>
 
+<nav class="nav-tabs" id="main-nav">
+    <button class="tab-btn active" onclick="switchTab('monitoring')">Мониторинг</button>
+    <button class="tab-btn" onclick="switchTab('maps')">Карты</button>
+</nav>
+
 <div id="app">
-    <div class="stage" id="main-stage">
-        <div class="status-card compact" id="main-card">
-            <div class="card-header">
-                <span class="label">УЗЕЛ: <span style="color:#fff">SAINT PETERSBURG</span></span>
-            </div>
-            
-            <div class="card-body">
-                <div id="server-result">ПОИСК</div>
-                <div id="brute-logs">ИНИЦИАЛИЗАЦИЯ...</div>
-                <div id="bsg-hint">ЛУЧШИЙ РЕГИОН ОПРЕДЕЛЁН.<br>СМЕНИТЕ ЕГО В ЛАУНЧЕРЕ.</div>
-            </div>
-
-            <div class="card-footer">
-                <div id="ping-container">
-                    <span class="label">ПИНГ:</span>
-                    <span id="ping-value" class="ping-val dots"></span>
+    <div id="monitoring" class="tab-content active">
+        <div class="stage">
+            <div class="status-card compact" id="main-card">
+                <div class="card-header">
+                    <span class="label">УЗЕЛ: <span style="color:#fff">SAINT PETERSBURG</span></span>
                 </div>
-                <button id="retry-trigger" class="retry-btn" onclick="startScan()">ПЕРЕЗАПУСК</button>
+                <div class="card-body">
+                    <div id="server-result">ПОИСК</div>
+                    <div id="brute-logs">АНАЛИЗ ТРАФИКА...</div>
+                    <div id="bsg-hint">ЛУЧШИЙ РЕГИОН ОПРЕДЕЛЁН.<br>СМЕНИТЕ ЕГО В ЛАУНЧЕРЕ.</div>
+                </div>
+                <div class="card-footer">
+                    <div id="ping-container">
+                        <span class="label">ПИНГ:</span>
+                        <span id="ping-value" class="ping-val dots"></span>
+                    </div>
+                    <button id="retry-trigger" class="retry-btn" onclick="startScan()">ПЕРЕЗАПУСК</button>
+                </div>
             </div>
-        </div>
-
-        <div class="side-panel" id="side-panel">
-            <div class="label" style="color:var(--accent); margin-bottom:15px; font-size: 10px;">ГРАФИК РОТАЦИИ</div>
-            <div style="margin-bottom:18px">
-                <div class="label" style="font-size: 8px; opacity: 0.6; margin-bottom: 5px;">ТЕКУЩИЙ СТАТУС</div>
-                <div id="cur-time-info" style="font-size:11px; color:#fff; font-weight:800; letter-spacing: 0.5px;">...</div>
-            </div>
-            <div>
-                <div class="label" style="font-size: 8px; opacity: 0.6; margin-bottom: 5px;">СЛЕДУЮЩИЙ ПЕРЕХОД</div>
-                <div id="next-transition" style="font-size:10px; color:#fff; font-weight:700; text-transform:uppercase; line-height:1.4">...</div>
+            <div class="side-panel" id="side-panel">
+                <div class="label" style="color:var(--accent); margin-bottom:15px; font-size: 10px;">ГРАФИК РОТАЦИИ</div>
+                <div style="margin-bottom:18px">
+                    <div class="label" style="font-size: 8px; opacity: 0.6; margin-bottom: 5px;">ТЕКУЩИЙ СТАТУС</div>
+                    <div id="cur-time-info" style="font-size:11px; color:#fff; font-weight:800;">...</div>
+                </div>
+                <div>
+                    <div class="label" style="font-size: 8px; opacity: 0.6; margin-bottom: 5px;">СЛЕДУЮЩИЙ ПЕРЕХОД</div>
+                    <div id="next-transition" style="font-size:10px; color:#fff; font-weight:700; text-transform:uppercase;">...</div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="social-area" id="social">
-        <a href="https://t.me/feeboi" class="social-btn btn-tg" target="_blank"><i class="fa-brands fa-telegram"></i></a>
-        <a href="https://www.tiktok.com/@feeboi1" class="social-btn btn-tt" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
-        <a href="https://www.donationalerts.com/r/feeboi" class="social-btn btn-da" target="_blank"><i class="fa-solid fa-circle-dollar-to-slot"></i></a>
+    <div id="maps" class="tab-content">
+        <div class="maps-grid">
+            <div class="map-card" onclick="openMap('customs')"><i class="fa-solid fa-road"></i><div>ТАМОЖНЯ</div></div>
+            <div class="map-card" onclick="openMap('woods')"><i class="fa-solid fa-tree"></i><div>ЛЕС</div></div>
+            <div class="map-card" onclick="openMap('interchange')"><i class="fa-solid fa-cart-shopping"></i><div>РАЗВЯЗКА</div></div>
+            <div class="map-card" onclick="openMap('reserve')"><i class="fa-solid fa-shield-halved"></i><div>РЕЗЕРВ</div></div>
+            <div class="map-card" onclick="openMap('shoreline')"><i class="fa-solid fa-water"></i><div>БЕРЕГ</div></div>
+            <div class="map-card" onclick="openMap('factory')"><i class="fa-solid fa-industry"></i><div>ЗАВОД</div></div>
+            <div class="map-card" onclick="openMap('streets')"><i class="fa-solid fa-city"></i><div>УЛИЦЫ ТАРКОВА</div></div>
+            <div class="map-card" onclick="openMap('lighthouse')"><i class="fa-solid fa-tower-observation"></i><div>МАЯК</div></div>
+            <div class="map-card" onclick="openMap('ground-zero')"><i class="fa-solid fa-crosshairs"></i><div>ЭПИЦЕНТР</div></div>
+            <div class="map-card" onclick="openMap('labs')"><i class="fa-solid fa-flask"></i><div>ЛАБОРАТОРИЯ</div></div>
+        </div>
     </div>
 </div>
 
+<div class="map-viewer" id="map-viewer">
+    <div class="map-viewer-header">
+        <div id="map-title" class="label" style="color:#fff">ЛОКАЦИЯ</div>
+        <button class="close-map" onclick="closeMap()">ЗАКРЫТЬ КАРТУ</button>
+    </div>
+    <iframe id="map-frame" src="" style="flex:1; border:none; background: #000;"></iframe>
+</div>
+
+<div class="social-area" id="social">
+    <a href="https://t.me/feeboi" class="social-btn" target="_blank"><i class="fa-brands fa-telegram"></i></a>
+    <a href="https://www.tiktok.com/@feeboi1" class="social-btn" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+</div>
+
 <script>
-    const techSteps = ["АНАЛИЗ ТРАФИКА", "ОБХОД ШЛЮЗОВ", "ПОИСК НОД", "РАСЧЕТ TTL", "ВЕРИФИКАЦИЯ", "ФИЛЬТРАЦИЯ УЗЛОВ"];
-    const serverPool = ["RUSSIA WEST", "RUSSIA CENTRAL", "EUROPE NORTH", "MIDDLE EAST", "ASIA CENTRAL", "NA NORTH EAST", "RUSSIA EAST", "EUROPE WEST"];
-    const daysRu = ["ВОСКРЕСЕНЬЕ", "ПОНЕДЕЛЬНИК", "ВТОРНИК", "СРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦА", "СУББОТА"];
-    
-    // СТРОГО ПО ТВОЕЙ ТАБЛИЦЕ
+    const techSteps = ["АНАЛИЗ ТРАФИКА", "ОБХОД ШЛЮЗОВ", "ВЕРИФИКАЦИЯ", "ГОТОВО"];
     const schedule = [
         { start: 6, end: 11, weekday: "Russia WEST, Russia CENTRAL", weekend: "Russia CENTRAL, Europe NORTH", ping: "13 – 73", nextTime: "12:00" },
         { start: 12, end: 17, weekday: "Middle East, Asia CENTRAL", weekend: "Asia CENTRAL, Russia EAST", ping: "68 – 109", nextTime: "18:00" },
@@ -241,41 +222,104 @@
         { start: 0, end: 5, weekday: "Europe CENTRAL, Europe WEST", weekend: "Europe WEST, Middle East", ping: "54 – 92", nextTime: "06:00" }
     ];
 
-    let isScanning = false;
-    let isFirstRun = true;
+    function switchTab(id) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function openMap(mapId) {
+        const viewer = document.getElementById('map-viewer');
+        const frame = document.getElementById('map-frame');
+        const title = document.getElementById('map-title');
+        
+        // Используем Tarkov.dev для встраивания (они позволяют iframe)
+        const mapUrls = {
+            'customs': 'https://tarkov.dev/map/customs?embed=true',
+            'woods': 'https://tarkov.dev/map/woods?embed=true',
+            'interchange': 'https://tarkov.dev/map/interchange?embed=true',
+            'reserve': 'https://tarkov.dev/map/reserve?embed=true',
+            'shoreline': 'https://tarkov.dev/map/shoreline?embed=true',
+            'factory': 'https://tarkov.dev/map/factory?embed=true',
+            'streets': 'https://tarkov.dev/map/streets-of-tarkov?embed=true',
+            'lighthouse': 'https://tarkov.dev/map/lighthouse?embed=true',
+            'ground-zero': 'https://tarkov.dev/map/ground-zero?embed=true',
+            'labs': 'https://tarkov.dev/map/the-lab?embed=true'
+        };
+
+        title.innerText = mapId.toUpperCase().replace('-', ' ');
+        frame.src = mapUrls[mapId];
+        viewer.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeMap() {
+        document.getElementById('map-viewer').classList.remove('active');
+        document.getElementById('map-frame').src = '';
+        document.body.style.overflow = 'auto';
+    }
 
     function getTarkovData() {
         const now = new Date();
         const hour = now.getHours();
-        const isWeekend = now.getDay() === 0 || now.getDay() === 6;
-        
-        // 1. Находим текущий индекс интервала
-        let currentIndex = schedule.findIndex(s => hour >= s.start && hour <= s.end);
-        if (currentIndex === -1) currentIndex = 2; // Резерв для 00:00
-
-        const currentData = schedule[currentIndex];
-        
-        // 2. Логика для СЛЕДУЮЩЕГО перехода
-        let nextIndex = (currentIndex + 1) % schedule.length;
-        const nextData = schedule[nextIndex];
-        
-        // Проверяем, не изменится ли тип дня (будни/выходные) при переходе
-        // Это важно только для ночного перехода в 00:00 или 01:00
-        let nextIsWeekend = isWeekend;
-        if (hour >= 18 && now.getDay() === 0) nextIsWeekend = false; // Воскресенье вечер -> Понедельник утро
-        if (hour >= 18 && now.getDay() === 5) nextIsWeekend = true;  // Пятница вечер -> Суббота утро
-
-        const nextServers = nextIsWeekend ? nextData.weekend : nextData.weekday;
-
+        const day = now.getDay();
+        const isWeekend = day === 0 || day === 6;
+        let idx = schedule.findIndex(s => hour >= s.start && hour <= s.end);
+        if (idx === -1) idx = 3;
+        const current = schedule[idx];
+        let nIdx = (idx + 1) % schedule.length;
+        const next = schedule[nIdx];
+        let nIsWeekend = isWeekend;
+        if (hour >= 18 && day === 0) nIsWeekend = false;
+        if (hour >= 18 && day === 5) nIsWeekend = true;
         return {
-            currentServers: isWeekend ? currentData.weekend : currentData.weekday,
-            currentPing: currentData.ping,
-            nextTime: currentData.nextTime,
-            nextServers: nextServers
+            cur: isWeekend ? current.weekend : current.weekday,
+            ping: current.ping,
+            nTime: current.nextTime,
+            nServ: nIsWeekend ? next.weekend : next.weekday
         };
     }
 
-    async function init() {
+    function startScan() {
+        const resEl = document.getElementById('server-result'), side = document.getElementById('side-panel'),
+              hint = document.getElementById('bsg-hint'), pingEl = document.getElementById('ping-value'),
+              btn = document.getElementById('retry-trigger'), card = document.getElementById('main-card'),
+              logsEl = document.getElementById('brute-logs');
+        
+        btn.disabled = true;
+        side.classList.remove('active'); hint.classList.remove('show');
+        card.classList.replace('expanded', 'compact');
+        resEl.classList.remove('found'); pingEl.className = "ping-val dots"; pingEl.innerText = "";
+        logsEl.style.opacity = "1";
+
+        let count = 0;
+        const data = getTarkovData();
+        const brute = setInterval(() => {
+            resEl.innerText = ["SEOUL", "ST. PETERSBURG", "FINLAND", "MILAN"][Math.floor(Math.random()*4)];
+            if(count++ > 30) {
+                clearInterval(brute);
+                resEl.innerText = data.cur;
+                resEl.classList.add('found');
+                logsEl.style.opacity = "0";
+                setTimeout(() => {
+                    card.classList.replace('compact', 'expanded');
+                    setTimeout(() => {
+                        hint.classList.add('show');
+                        pingEl.className = "ping-val";
+                        pingEl.innerText = data.ping;
+                        document.getElementById('cur-time-info').innerText = new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                        document.getElementById('next-transition').innerText = `${data.nTime} / ${data.nServ}`;
+                        side.classList.add('active');
+                        btn.disabled = false;
+                    }, 400);
+                }, 400);
+            }
+        }, 50);
+    }
+
+    // Инициализация загрузки
+    window.onload = () => {
         let step = 0;
         const boot = document.getElementById('boot-status');
         const header = document.getElementById('site-header');
@@ -283,86 +327,20 @@
             if(step < techSteps.length) { boot.innerText = techSteps[step]; step++; }
             else {
                 clearInterval(itv);
-                boot.innerText = "СИСТЕМА ГОТОВА К ЗАПУСКУ";
-                boot.className = "boot-white system-ready";
+                boot.style.opacity = '0';
                 setTimeout(() => {
-                    boot.style.opacity = '0'; 
-                    setTimeout(() => { header.classList.replace('as-logo', 'as-header'); showApp(); }, 500);
-                }, 1000);
+                    header.classList.replace('as-logo', 'as-header');
+                    document.getElementById('main-nav').classList.add('show');
+                    document.getElementById('app').style.display = 'flex';
+                    setTimeout(() => { 
+                        document.getElementById('app').style.opacity = '1';
+                        document.getElementById('social').style.opacity = '1';
+                        startScan(); 
+                    }, 200);
+                }, 500);
             }
         }, 600);
-    }
-
-    function showApp() {
-        const app = document.getElementById('app');
-        app.style.display = 'flex';
-        setTimeout(() => {
-            app.style.opacity = '1';
-            startScan();
-        }, 300);
-    }
-
-    function startScan() {
-        if(isScanning) return;
-        isScanning = true;
-
-        const resEl = document.getElementById('server-result'), 
-              logsEl = document.getElementById('brute-logs'), 
-              side = document.getElementById('side-panel'), 
-              hint = document.getElementById('bsg-hint'), 
-              pingEl = document.getElementById('ping-value'), 
-              btn = document.getElementById('retry-trigger'), 
-              card = document.getElementById('main-card');
-
-        btn.disabled = true;
-        side.classList.remove('active');
-        hint.classList.remove('show');
-        card.classList.replace('expanded', 'compact');
-        resEl.classList.remove('found', 'animate-found');
-        pingEl.className = "ping-val dots";
-        pingEl.innerText = "";
-        logsEl.style.opacity = "1";
-
-        const speedFactor = isFirstRun ? 1 : 0.4;
-        const totalIterations = isFirstRun ? 60 : 25;
-        const tarkov = getTarkovData();
-
-        let count = 0;
-        const brute = setInterval(() => {
-            resEl.innerText = serverPool[Math.floor(Math.random()*serverPool.length)];
-            count++;
-            if(count > totalIterations) {
-                clearInterval(brute); clearInterval(logsInterval);
-                
-                resEl.innerText = tarkov.currentServers;
-                resEl.classList.add('found', 'animate-found');
-                logsEl.style.opacity = "0";
-                
-                setTimeout(() => {
-                    card.classList.replace('compact', 'expanded');
-                    setTimeout(() => {
-                        hint.classList.add('show');
-                        pingEl.className = "ping-val";
-                        pingEl.innerText = tarkov.currentPing;
-                        setTimeout(() => {
-                            const now = new Date();
-                            const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-                            document.getElementById('cur-time-info').innerText = `${timeStr} (${daysRu[now.getDay()]})`;
-                            
-                            // ВЫВОД СЛЕДУЮЩЕГО ПЕРЕХОДА: ВРЕМЯ + СЕРВЕРЫ
-                            document.getElementById('next-transition').innerText = `${tarkov.nextTime} / ${tarkov.nextServers}`;
-                            
-                            side.classList.add('active');
-                            document.getElementById('social').style.opacity = '1';
-                            isScanning = false; isFirstRun = false; btn.disabled = false;
-                        }, 500);
-                    }, 400);
-                }, 400);
-            }
-        }, 80 * speedFactor);
-        const logsInterval = setInterval(() => { logsEl.innerText = techSteps[Math.floor(Math.random()*techSteps.length)] + "..."; }, 450 * speedFactor);
-    }
-    init();
+    };
 </script>
 </body>
 </html>
