@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TARK / РЕГИОН</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --bg: #050506;
+            --card-bg: #0d0e10;
+            --accent: #FFB800;    
+            --success: #00E0FF;   
+            --text: #ffffff;
+            --muted: #1a1b20;     
+            --sub-text: #666;     
+            --tg-color: #229ED9;
+            --tt-color: #010101;
+            --da-color: #FF7300;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        header {
+            position: fixed;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 1000;
+        }
+        header.as-logo { top: 45%; transform: translateY(-50%); }
+        header.as-header { top: 40px; transform: scale(0.8); }
+
+        .logo-main { font-size: 42px; font-weight: 900; letter-spacing: 15px; color: #fff; line-height: 1; margin-right: -15px; }
+        .logo-sub { font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #333; text-transform: uppercase; margin-top: 5px; text-align: right; width: 100%; }
+
+        .logo-slogan {
+            font-size: 10px; font-weight: 700; letter-spacing: 1px; color: #ccc;
+            text-transform: uppercase; margin-top: 10px; text-align: center; width: 100%;
+            opacity: 0; transform: translateY(5px);
+            transition: all 1s ease 0.5s;
+        }
+        header.as-header .logo-slogan { opacity: 1; transform: translateY(0); }
+
+        #boot-status { 
+            position: absolute; top: 100px; width: 500px; left: 50%; transform: translateX(-50%);
+            text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: 5px; 
+            font-weight: 800; transition: opacity 0.4s ease;
+        }
+
+        #app {
+            display: none; flex-direction: column; align-items: center;
+            opacity: 0; transition: opacity 1s ease;
+            margin-top: 80px;
+        }
+
+        .stage {
+            position: relative;
+            width: 420px; 
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .status-card {
+            background: var(--card-bg); 
+            border: 1px solid var(--muted); 
+            border-radius: 20px;
+            width: 100%; 
+            display: flex; flex-direction: column;
+            box-shadow: 0 50px 100px rgba(0,0,0,1); 
+            z-index: 20; 
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .status-card.compact { height: 210px; }
+        .status-card.expanded { height: 320px; }
+
+        .card-header { height: 60px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid rgba(255,255,255,0.02); }
+        .label { color: var(--sub-text); font-size: 10px; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; }
+        
+        .card-body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 0 30px; text-align: center; }
+        
+        #server-result { font-size: 24px; font-weight: 900; text-transform: uppercase; color: #fff; width: 100%; line-height: 1.2; }
+        #server-result.found { color: var(--success) !important; text-shadow: 0 0 40px rgba(0, 224, 255, 0.4); }
+
+        #bsg-hint { 
+            font-size: 11px; color: #fff; font-weight: 700; letter-spacing: 1px; 
+            margin-top: 0; height: 0; opacity: 0; overflow: hidden;
+            transition: all 0.6s ease; line-height: 1.5; 
+        }
+        #bsg-hint.show { height: 40px; margin-top: 20px; opacity: 0.8; }
+
+        #brute-logs { margin-top: 15px; font-size: 9px; color: var(--accent); letter-spacing: 2px; text-transform: uppercase; font-weight: 700; }
+
+        .card-footer { height: 80px; border-top: 1px solid rgba(255,255,255,0.02); display: flex; align-items: center; justify-content: space-around; }
+
+        #ping-container { display: flex; align-items: center; width: 140px; }
+        .ping-val { font-weight: 900; color: #fff; font-size: 20px; margin-left: 10px; display: inline-block; min-width: 20px; }
+
+        .side-panel {
+            position: absolute; 
+            top: 50%; 
+            left: 50%; 
+            width: 210px; 
+            height: 180px;
+            background: #08090b; 
+            border: 1px solid var(--muted); 
+            border-radius: 0 20px 20px 0;
+            display: flex; 
+            flex-direction: column; 
+            justify-content: center; 
+            padding: 0 20px 0 35px; 
+            opacity: 0; 
+            z-index: 10; 
+            transform: translate(0, -50%); 
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            pointer-events: none; 
+        }
+        .side-panel.active { 
+            transform: translate(210px, -50%); 
+            opacity: 1; 
+            pointer-events: auto; 
+        }
+
+        .retry-btn { 
+            background: none; 
+            border: 1px solid #333; 
+            color: #666; 
+            font-size: 10px; 
+            font-weight: 800; 
+            letter-spacing: 2px; 
+            padding: 12px 24px; 
+            cursor: pointer; 
+            border-radius: 8px; 
+            transition: 0.3s;
+            position: relative;
+            z-index: 30;
+        }
+        .retry-btn:hover:not(:disabled) { border-color: #fff; color: #fff; }
+        .retry-btn:disabled { opacity: 0.2; cursor: not-allowed; }
+
+        .social-area { position: fixed; bottom: 40px; display: flex; gap: 15px; opacity: 0; transition: 1s; }
+        .social-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 100px; height: 45px; border-radius: 8px; text-decoration: none;
+            font-size: 18px; color: rgba(255,255,255,0.6);
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .btn-tg:hover { background: var(--tg-color); color: #fff; box-shadow: 0 10px 20px rgba(34, 158, 217, 0.3); transform: translateY(-5px); }
+        .btn-tt:hover { background: var(--tt-color); color: #fff; box-shadow: -3px 0 0 #ff0050, 3px 0 0 #00f2ea, 0 10px 20px rgba(0,0,0,0.5); transform: translateY(-5px); }
+        .btn-da:hover { background: var(--da-color); color: #fff; box-shadow: 0 10px 20px rgba(255, 115, 0, 0.3); transform: translateY(-5px); }
+
+        .dots:after { content: ''; animation: dots 1.5s infinite; }
+        @keyframes dots { 0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; } }
+
+        @keyframes serverFound {
+            0% { opacity: 0; transform: scale(0.9); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .animate-found { animation: serverFound 0.5s ease forwards; }
+    </style>
+</head>
+<body>
+
+<header id="site-header" class="as-logo">
+    <div class="logo-main">/TARK</div>
+    <div class="logo-sub">by feeboi</div>
+    <div class="logo-slogan">твоя помощь в фарме и квестах</div>
+    <div id="boot-status" class="boot-yellow">ЗАГРУЗКА СИСТЕМНЫХ МОДУЛЕЙ</div>
+</header>
+
+<div id="app">
+    <div class="stage" id="main-stage">
+        <div class="status-card compact" id="main-card">
+            <div class="card-header">
+                <span class="label">УЗЕЛ: <span style="color:#fff">SAINT PETERSBURG</span></span>
+            </div>
+            
+            <div class="card-body">
+                <div id="server-result">ПОИСК</div>
+                <div id="brute-logs">ИНИЦИАЛИЗАЦИЯ...</div>
+                <div id="bsg-hint">ЛУЧШИЙ РЕГИОН ОПРЕДЕЛЁН.<br>СМЕНИТЕ ЕГО В ЛАУНЧЕРЕ.</div>
+            </div>
+
+            <div class="card-footer">
+                <div id="ping-container">
+                    <span class="label">ПИНГ:</span>
+                    <span id="ping-value" class="ping-val dots"></span>
+                </div>
+                <button id="retry-trigger" class="retry-btn" onclick="startScan()">ПЕРЕЗАПУСК</button>
+            </div>
+        </div>
+
+        <div class="side-panel" id="side-panel">
+            <div class="label" style="color:var(--accent); margin-bottom:15px; font-size: 10px;">ГРАФИК РОТАЦИИ</div>
+            <div style="margin-bottom:18px">
+                <div class="label" style="font-size: 8px; opacity: 0.6; margin-bottom: 5px;">ТЕКУЩИЙ СТАТУС</div>
+                <div id="cur-time-info" style="font-size:11px; color:#fff; font-weight:800; letter-spacing: 0.5px;">...</div>
+            </div>
+            <div>
+                <div class="label" style="font-size: 8px; opacity: 0.6; margin-bottom: 5px;">СЛЕДУЮЩИЙ ПЕРЕХОД</div>
+                <div id="next-transition" style="font-size:10px; color:#fff; font-weight:700; text-transform:uppercase; line-height:1.4">...</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="social-area" id="social">
+        <a href="https://t.me/feeboi" class="social-btn btn-tg" target="_blank"><i class="fa-brands fa-telegram"></i></a>
+        <a href="https://www.tiktok.com/@feeboi1" class="social-btn btn-tt" target="_blank"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://www.donationalerts.com/r/feeboi" class="social-btn btn-da" target="_blank"><i class="fa-solid fa-circle-dollar-to-slot"></i></a>
+    </div>
+</div>
+
+<script>
+    const techSteps = ["АНАЛИЗ ТРАФИКА", "ОБХОД ШЛЮЗОВ", "ПОИСК НОД", "РАСЧЕТ TTL", "ВЕРИФИКАЦИЯ", "ФИЛЬТРАЦИЯ УЗЛОВ"];
+    const serverPool = ["RUSSIA WEST", "RUSSIA CENTRAL", "EUROPE NORTH", "MIDDLE EAST", "ASIA CENTRAL", "NA NORTH EAST", "RUSSIA EAST", "EUROPE WEST"];
+    const daysRu = ["ВОСКРЕСЕНЬЕ", "ПОНЕДЕЛЬНИК", "ВТОРНИК", "СРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦА", "СУББОТА"];
+    
+    // СТРОГО ПО ТВОЕЙ ТАБЛИЦЕ
+    const schedule = [
+        { start: 6, end: 11, weekday: "Russia WEST, Russia CENTRAL", weekend: "Russia CENTRAL, Europe NORTH", ping: "13 – 73", nextTime: "12:00" },
+        { start: 12, end: 17, weekday: "Middle East, Asia CENTRAL", weekend: "Asia CENTRAL, Russia EAST", ping: "68 – 109", nextTime: "18:00" },
+        { start: 18, end: 23, weekday: "NA North East, Russia EAST", weekend: "Только NA North East", ping: "109 – 136", nextTime: "01:00" },
+        { start: 0, end: 5, weekday: "Europe CENTRAL, Europe WEST", weekend: "Europe WEST, Middle East", ping: "54 – 92", nextTime: "06:00" }
+    ];
+
+    let isScanning = false;
+    let isFirstRun = true;
+
+    function getTarkovData() {
+        const now = new Date();
+        const hour = now.getHours();
+        const isWeekend = now.getDay() === 0 || now.getDay() === 6;
+        
+        // 1. Находим текущий индекс интервала
+        let currentIndex = schedule.findIndex(s => hour >= s.start && hour <= s.end);
+        if (currentIndex === -1) currentIndex = 2; // Резерв для 00:00
+
+        const currentData = schedule[currentIndex];
+        
+        // 2. Логика для СЛЕДУЮЩЕГО перехода
+        let nextIndex = (currentIndex + 1) % schedule.length;
+        const nextData = schedule[nextIndex];
+        
+        // Проверяем, не изменится ли тип дня (будни/выходные) при переходе
+        // Это важно только для ночного перехода в 00:00 или 01:00
+        let nextIsWeekend = isWeekend;
+        if (hour >= 18 && now.getDay() === 0) nextIsWeekend = false; // Воскресенье вечер -> Понедельник утро
+        if (hour >= 18 && now.getDay() === 5) nextIsWeekend = true;  // Пятница вечер -> Суббота утро
+
+        const nextServers = nextIsWeekend ? nextData.weekend : nextData.weekday;
+
+        return {
+            currentServers: isWeekend ? currentData.weekend : currentData.weekday,
+            currentPing: currentData.ping,
+            nextTime: currentData.nextTime,
+            nextServers: nextServers
+        };
+    }
+
+    async function init() {
+        let step = 0;
+        const boot = document.getElementById('boot-status');
+        const header = document.getElementById('site-header');
+        const itv = setInterval(() => {
+            if(step < techSteps.length) { boot.innerText = techSteps[step]; step++; }
+            else {
+                clearInterval(itv);
+                boot.innerText = "СИСТЕМА ГОТОВА К ЗАПУСКУ";
+                boot.className = "boot-white system-ready";
+                setTimeout(() => {
+                    boot.style.opacity = '0'; 
+                    setTimeout(() => { header.classList.replace('as-logo', 'as-header'); showApp(); }, 500);
+                }, 1000);
+            }
+        }, 600);
+    }
+
+    function showApp() {
+        const app = document.getElementById('app');
+        app.style.display = 'flex';
+        setTimeout(() => {
+            app.style.opacity = '1';
+            startScan();
+        }, 300);
+    }
+
+    function startScan() {
+        if(isScanning) return;
+        isScanning = true;
+
+        const resEl = document.getElementById('server-result'), 
+              logsEl = document.getElementById('brute-logs'), 
+              side = document.getElementById('side-panel'), 
+              hint = document.getElementById('bsg-hint'), 
+              pingEl = document.getElementById('ping-value'), 
+              btn = document.getElementById('retry-trigger'), 
+              card = document.getElementById('main-card');
+
+        btn.disabled = true;
+        side.classList.remove('active');
+        hint.classList.remove('show');
+        card.classList.replace('expanded', 'compact');
+        resEl.classList.remove('found', 'animate-found');
+        pingEl.className = "ping-val dots";
+        pingEl.innerText = "";
+        logsEl.style.opacity = "1";
+
+        const speedFactor = isFirstRun ? 1 : 0.4;
+        const totalIterations = isFirstRun ? 60 : 25;
+        const tarkov = getTarkovData();
+
+        let count = 0;
+        const brute = setInterval(() => {
+            resEl.innerText = serverPool[Math.floor(Math.random()*serverPool.length)];
+            count++;
+            if(count > totalIterations) {
+                clearInterval(brute); clearInterval(logsInterval);
+                
+                resEl.innerText = tarkov.currentServers;
+                resEl.classList.add('found', 'animate-found');
+                logsEl.style.opacity = "0";
+                
+                setTimeout(() => {
+                    card.classList.replace('compact', 'expanded');
+                    setTimeout(() => {
+                        hint.classList.add('show');
+                        pingEl.className = "ping-val";
+                        pingEl.innerText = tarkov.currentPing;
+                        setTimeout(() => {
+                            const now = new Date();
+                            const timeStr = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                            document.getElementById('cur-time-info').innerText = `${timeStr} (${daysRu[now.getDay()]})`;
+                            
+                            // ВЫВОД СЛЕДУЮЩЕГО ПЕРЕХОДА: ВРЕМЯ + СЕРВЕРЫ
+                            document.getElementById('next-transition').innerText = `${tarkov.nextTime} / ${tarkov.nextServers}`;
+                            
+                            side.classList.add('active');
+                            document.getElementById('social').style.opacity = '1';
+                            isScanning = false; isFirstRun = false; btn.disabled = false;
+                        }, 500);
+                    }, 400);
+                }, 400);
+            }
+        }, 80 * speedFactor);
+        const logsInterval = setInterval(() => { logsEl.innerText = techSteps[Math.floor(Math.random()*techSteps.length)] + "..."; }, 450 * speedFactor);
+    }
+    init();
+</script>
+</body>
+</html>
